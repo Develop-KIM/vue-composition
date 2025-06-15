@@ -1,19 +1,46 @@
 <template>
-  <div>
-    <p>{{ message }}</p>
-    <button @click="changeMessage">Change</button>
-  </div>
+  <TodoHeader></TodoHeader>
+  <TodoInput @add="addTodoItem"></TodoInput>
+  <TodoList :todoItems="todoItems"></TodoList>
 </template>
 
 <script>
-import { useMessage } from "./hooks/useMessage";
+
+import TodoHeader from "@/components/TodoHeader.vue";
+import TodoInput from "@/components/TodoInput.vue";
+import TodoList from "@/components/TodoList.vue";
+import { ref } from "vue";
 
 export default {
+  components: {
+    TodoHeader,
+    TodoInput,
+    TodoList,
+  },
   setup() {
-    const { message, changeMessage } = useMessage();
+    // data
+    const todoItems = ref([]);
 
-    return { message, changeMessage };
+    // methods
+    function fetchTodos() {
+      const result = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const todoItem = localStorage.key(i);
+        // items.value.push(todoItem);
+        result.push(todoItem);
+      }
+      return result;
+    }
+    todoItems.value = fetchTodos();
+
+    function addTodoItem(todo) {
+      todoItems.value.push(todo);
+      localStorage.setItem(todo, todo);
+    }
+
+    return { todoItems, addTodoItem };
   }
+
 }
 </script>
 
