@@ -1,7 +1,7 @@
 <template>
-  <TodoHeader></TodoHeader>
+  <TodoHeader :appTitle="title"></TodoHeader>
   <TodoInput @add="addTodoItem"></TodoInput>
-  <TodoList :todoItems="todoItems"></TodoList>
+  <TodoList :todoItems="todoItems" @remove="removeTodoItem"></TodoList>
 </template>
 
 <script>
@@ -9,7 +9,8 @@
 import TodoHeader from "@/components/TodoHeader.vue";
 import TodoInput from "@/components/TodoInput.vue";
 import TodoList from "@/components/TodoList.vue";
-import { ref } from "vue";
+import { useTodo } from "@/hooks/useTodo";
+import { onBeforeMount } from "vue";
 
 export default {
   components: {
@@ -17,30 +18,30 @@ export default {
     TodoInput,
     TodoList,
   },
+  data() {
+    return {
+      title: 'vue-composition',
+    }
+  },
   setup() {
-    // data
-    const todoItems = ref([]);
+    const { todoItems, addTodoItem, fetchTodos } = useTodo();
 
-    // methods
-    function fetchTodos() {
-      const result = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const todoItem = localStorage.key(i);
-        // items.value.push(todoItem);
-        result.push(todoItem);
-      }
-      return result;
+    onBeforeMount(() => {
+      todoItems.value = fetchTodos();
+    })
+
+    return {
+      todoItems,
+      addTodoItem,
+      fetchTodos
     }
-    todoItems.value = fetchTodos();
-
-    function addTodoItem(todo) {
-      todoItems.value.push(todo);
-      localStorage.setItem(todo, todo);
+  },
+  methods: {
+    removeTodoItem(item, index) {
+      this.todoItems.splice(index, 1);
+      localStorage.removeItem(item);
     }
-
-    return { todoItems, addTodoItem };
   }
-
 }
 </script>
 
