@@ -1,4 +1,4 @@
-import { onBeforeMount, ref } from "vue";
+import { ref } from "vue";
 
 function useTodo() {
 	const todoItems = ref([]);
